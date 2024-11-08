@@ -199,10 +199,15 @@
                 spinner.style.display = "none";
             });
         }
+const response = await fetch("http://127.0.0.1:5000/colorize", {
+    method: "POST",
+    body: formData
+});
 
         function downloadImage() {
             // This function is configured within the uploadImage function's promise response
-        }
+       
+    }
     </script>
 </body>
 </html>
