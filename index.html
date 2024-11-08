@@ -34,13 +34,12 @@
             formData.append("file", fileInput.files[0]);
             formData.append("style", style);
 
-            // Display the original image for reference
             const originalImage = document.getElementById("originalImage");
             originalImage.src = URL.createObjectURL(fileInput.files[0]);
             originalImage.style.display = "block";
 
             try {
-                const response = await fetch("http://127.0.0.1:5000/colorize", {
+                const response = await fetch("https://YOUR-HEROKU-APP-NAME.herokuapp.com/colorize", {
                     method: "POST",
                     body: formData
                 });
