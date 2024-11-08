@@ -1,39 +1,66 @@
-async function uploadImage() {
-    const fileInput = document.getElementById("fileInput");
-    const style = document.getElementById("styleSelect").value;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Colorization App</title>
+</head>
+<body>
+    <h1>Image Colorization App</h1>
+    <input type="file" id="fileInput" accept="image/*">
+    <select id="styleSelect">
+        <option value="vibrant">Vibrant</option>
+        <option value="pastel">Pastel</option>
+        <option value="natural">Natural</option>
+    </select>
+    <button onclick="uploadImage()">Colorize</button>
+    <div>
+        <h3>Original Image:</h3>
+        <img id="originalImage" style="max-width: 100%; display: none;">
+        <h3>Colorized Image:</h3>
+        <img id="colorizedImage" style="max-width: 100%; display: none;">
+    </div>
+    <script>
+        async function uploadImage() {
+            const fileInput = document.getElementById("fileInput");
+            const style = document.getElementById("styleSelect").value;
 
-    if (!fileInput.files[0]) {
-        alert("Please select an image.");
-        return;
-    }
+            if (!fileInput.files[0]) {
+                alert("Please select an image.");
+                return;
+            }
 
-    const formData = new FormData();
-    formData.append("file", fileInput.files[0]);
-    formData.append("style", style);
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+            formData.append("style", style);
 
-    const originalImage = document.getElementById("originalImage");
-    originalImage.src = URL.createObjectURL(fileInput.files[0]);
-    originalImage.style.display = "block";
+            // Display the original image for reference
+            const originalImage = document.getElementById("originalImage");
+            originalImage.src = URL.createObjectURL(fileInput.files[0]);
+            originalImage.style.display = "block";
 
-    try {
-        const response = await fetch("http://127.0.0.1:5000/colorize", {
-            method: "POST",
-            body: formData
-        });
+            try {
+                const response = await fetch("http://127.0.0.1:5000/colorize", {
+                    method: "POST",
+                    body: formData
+                });
 
-        if (!response.ok) {
-            const errorText = await response.json();
-            alert(`Error: ${errorText.error}`);
-            return;
+                if (!response.ok) {
+                    const errorText = await response.json();
+                    alert(`Error: ${errorText.error}`);
+                    return;
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const colorizedImage = document.getElementById("colorizedImage");
+                colorizedImage.src = url;
+                colorizedImage.style.display = "block";
+            } catch (error) {
+                alert("Failed to colorize the image.");
+                console.error("Error:", error);
+            }
         }
-
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        const colorizedImage = document.getElementById("colorizedImage");
-        colorizedImage.src = url;
-        colorizedImage.style.display = "block";
-    } catch (error) {
-        alert("Failed to colorize the image.");
-        console.error("Error:", error);
-    }
-}
+    </script>
+</body>
+</html>
