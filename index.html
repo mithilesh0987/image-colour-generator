@@ -1,213 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Image Colorization App</title>
-    <style>
-        /* Basic Styling */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            flex-direction: column;
-        }
+async function uploadImage() {
+    const fileInput = document.getElementById("fileInput");
+    const style = document.getElementById("styleSelect").value;
 
-        /* Container */
-        .container {
-            width: 90%;
-            max-width: 800px;
-            background: #fff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            text-align: center;
-        }
-
-        /* Title */
-        h1 {
-            color: #667eea;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-        }
-
-        /* File input and buttons */
-        .file-label, .options-label, .btn, .download-btn {
-            display: inline-block;
-            font-size: 1em;
-            padding: 12px 24px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px 0;
-            transition: 0.3s;
-        }
-
-        .file-label, .options-label {
-            color: #667eea;
-            background: #fff;
-            border: 2px solid #667eea;
-        }
-
-        .file-label:hover, .options-label:hover, .btn:hover, .download-btn:hover {
-            background: #667eea;
-            color: #fff;
-        }
-
-        .btn {
-            background: #667eea;
-            color: #fff;
-            border: none;
-        }
-
-        .download-btn {
-            display: none;
-            background: #764ba2;
-            color: #fff;
-            border: none;
-        }
-
-        /* Image Display */
-        img {
-            max-width: 100%;
-            height: auto;
-            margin-top: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            display: none;
-            margin: 20px auto;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Professional Image Colorization</h1>
-        <p>Upload a grayscale image and apply different colorization styles!</p>
-
-        <!-- File Input -->
-        <label for="fileInput" class="file-label">Choose an Image</label>
-        <input type="file" id="fileInput" accept="image/*" style="display: none;">
-
-        <!-- Colorization Style Options -->
-        <div>
-            <label for="colorStyle" class="options-label">Choose a Colorization Style:</label>
-            <select id="colorStyle" class="options-select">
-                <option value="vibrant">Vibrant</option>
-                <option value="pastel">Pastel</option>
-                <option value="natural">Natural</option>
-            </select>
-        </div>
-
-        <!-- Colorize Button -->
-        <button class="btn" onclick="uploadImage()">Colorize</button>
-
-        <!-- Loading Spinner -->
-        <div class="spinner" id="spinner"></div>
-
-        <!-- Display Images -->
-        <div>
-            <h2>Original Image</h2>
-            <img id="originalImage" src="" alt="Original Image" style="display: none;">
-        </div>
-        <div>
-            <h2>Colorized Image</h2>
-            <img id="colorizedImage" src="" alt="Colorized Image" style="display: none;">
-        </div>
-
-        <!-- Download Button -->
-        <button class="download-btn" id="downloadBtn" onclick="downloadImage()">Download Colorized Image</button>
-    </div>
-
-    <script>
-        function uploadImage() {
-            const fileInput = document.getElementById("fileInput");
-            const originalImage = document.getElementById("originalImage");
-            const colorizedImage = document.getElementById("colorizedImage");
-            const colorStyle = document.getElementById("colorStyle").value;
-            const spinner = document.getElementById("spinner");
-            const downloadBtn = document.getElementById("downloadBtn");
-
-            // Show loading spinner
-            spinner.style.display = "block";
-            downloadBtn.style.display = "none";
-
-            if (!fileInput.files[0]) {
-                alert("Please select an image to colorize.");
-                spinner.style.display = "none";
-                return;
-            }
-
-            // Display the original image
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                originalImage.src = e.target.result;
-                originalImage.style.display = "block";
-            };
-            reader.readAsDataURL(fileInput.files[0]);
-
-            // Prepare the file for upload
-            const formData = new FormData();
-            formData.append("file", fileInput.files[0]);
-            formData.append("style", colorStyle); // Send style as a parameter
-
-            // Send image to backend for colorization
-            fetch("<YOUR_BACKEND_FUNCTION_URL>", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => response.blob())
-            .then(blob => {
-                // Hide loading spinner
-                spinner.style.display = "none";
-
-                // Display the colorized image
-                const url = URL.createObjectURL(blob);
-                colorizedImage.src = url;
-                colorizedImage.style.display = "block";
-
-                // Enable download button
-                downloadBtn.style.display = "inline-block";
-                downloadBtn.onclick = () => {
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = "colorized_image.jpg";
-                    link.click();
-                };
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("Failed to colorize the image.");
-                spinner.style.display = "none";
-            });
-        }
-const response = await fetch("http://127.0.0.1:5000/colorize", {
-    method: "POST",
-    body: formData
-});
-
-        function downloadImage() {
-            // This function is configured within the uploadImage function's promise response
-       
+    if (!fileInput.files[0]) {
+        alert("Please select an image.");
+        return;
     }
-    </script>
-</body>
-</html>
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+    formData.append("style", style);
+
+    const originalImage = document.getElementById("originalImage");
+    originalImage.src = URL.createObjectURL(fileInput.files[0]);
+    originalImage.style.display = "block";
+
+    try {
+        const response = await fetch("http://127.0.0.1:5000/colorize", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorText = await response.json();
+            alert(`Error: ${errorText.error}`);
+            return;
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const colorizedImage = document.getElementById("colorizedImage");
+        colorizedImage.src = url;
+        colorizedImage.style.display = "block";
+    } catch (error) {
+        alert("Failed to colorize the image.");
+        console.error("Error:", error);
+    }
+}
